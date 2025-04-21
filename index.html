@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Time - Login/Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+
+<body>
+
+     <div class="container">
+        <div id="authArea">
+            <button id="showLogin">Login</button>
+            <button id="showRegister">Register</button>
+
+            <form id="loginForm">
+                <h2>Login</h2>
+                <input type="email" id="loginEmail" placeholder="Email" required><br><br>
+                <input type="password" id="loginPassword" placeholder="Password" required><br><br>
+                <button type="submit">Log In</button>
+                <div id="loginMsg" style="color: red;"></div>
+            </form>
+
+            <form id="registerForm" style="display: none;">
+                <h2>Register</h2>
+                <input type="email" id="registerEmail" placeholder="Email" required><br><br>
+                <input type="password" id="registerPassword" placeholder="Password" required><br><br>
+                <button type="submit">Sign Up</button>
+                <div id="registerMsg" style="color: green;"></div>
+            </form>
+        </div>
+
+
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const showLoginBtn = document.getElementById('showLogin');
+            const showRegisterBtn = document.getElementById('showRegister');
+            const loginMsg = document.getElementById('loginMsg');
+            const registerMsg = document.getElementById('registerMsg');
+
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+
+            showRegisterBtn.onclick = () => {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            };
+
+            showLoginBtn.onclick = () => {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            };
+
+            loginForm.onsubmit = function(e) {
+                e.preventDefault();
+                const email = loginForm.loginEmail.value;
+                const password = loginForm.loginPassword.value;
+
+                if (email === 'admin@quiz.com' && password === 'admin123') {
+                    localStorage.setItem('currentUser', JSON.stringify({ email: email, isAdmin: true }));
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                if (users[email] && users[email].password === password) {
+                    localStorage.setItem('currentUser', JSON.stringify({ email: email, isAdmin: false }));
+                    window.location.href = 'home.html';
+                } else {
+                    loginMsg.textContent = 'Wrong email or password.';
+                }
+            };
+
+            registerForm.onsubmit = function(e) {
+                e.preventDefault();
+                const email = registerForm.registerEmail.value;
+                const password = registerForm.registerPassword.value;
+
+                if (users[email]) {
+                    registerMsg.style.color = 'red';
+                    registerMsg.textContent = 'Email already taken.';
+                    return;
+                }
+
+                users[email] = { password: password };
+                localStorage.setItem('users', JSON.stringify(users));
+                registerMsg.style.color = 'green';
+                registerMsg.textContent = 'Account created! You can log in now.';
+                registerForm.reset();
+            };
+        });
+    </script>
+
+</body>
+
+
+</html>
